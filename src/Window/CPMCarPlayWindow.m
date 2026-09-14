@@ -84,6 +84,7 @@ static id CPMGetCarPlayCADisplay(void) {
         CGRect windowBounds = self.rootWindow.bounds;
         CGFloat dockWidth = self.isFullscreen ? 0 : CPM_CARPLAY_DOCK_WIDTH;
         CGFloat dockXOrigin = [self shouldUseRightHandDock] ? 0 : dockWidth;
+    (void)dockXOrigin;
 
         self.appContainerView = [[UIView alloc] initWithFrame:CGRectMake(
             [self shouldUseRightHandDock] ? 0 : dockWidth,
@@ -231,7 +232,7 @@ static id CPMGetCarPlayCADisplay(void) {
         if (!sceneManagerCoord) return;
 
         id mainScreenIdentity = objcInvoke(sceneManagerCoord, @"displayIdentity");
-        id sceneIdentity = objcInvoke_2(sceneManagerCoord, @"_sceneIdentityForApplication:createPrimaryIfRequired:", self.application, 1);
+        id sceneIdentity = objcInvoke_2(sceneManagerCoord, @"_sceneIdentityForApplication:createPrimaryIfRequired:", self.application, @YES);
 
         id sceneHandleRequest = objcInvoke_3(objc_getClass("SBApplicationSceneHandleRequest"), 
                                             @"defaultRequestForApplication:sceneIdentity:displayIdentity:", 
@@ -249,7 +250,7 @@ static id CPMGetCarPlayCADisplay(void) {
 
             // Notify user app to rotate
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [[NSDistributedNotificationCenter defaultCenter] postNotificationName:CPM_ROTATION_NOTIFICATION 
+                [[NSNotificationCenter defaultCenter] postNotificationName:CPM_ROTATION_NOTIFICATION 
                                                                                object:self.bundleIdentifier 
                                                                              userInfo:@{@"orientation": @(self.orientation)}];
             });
@@ -286,7 +287,7 @@ static id CPMGetCarPlayCADisplay(void) {
     }
 
     CPMLog(@"Rotating app to orientation: %ld", (long)self.orientation);
-    [[NSDistributedNotificationCenter defaultCenter] postNotificationName:CPM_ROTATION_NOTIFICATION 
+    [[NSNotificationCenter defaultCenter] postNotificationName:CPM_ROTATION_NOTIFICATION 
                                                                    object:self.bundleIdentifier 
                                                                  userInfo:@{@"orientation": @(self.orientation)}];
 }
